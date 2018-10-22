@@ -6,7 +6,7 @@ functions {
                  real sigma_t, 
                  real sigma_p, 
                  real rho){
-
+        // return d_t; //test function can run 
         return (1/(2 * pi() * sigma_t * sigma_p * sqrt(1 - square(rho)))) * 
             exp( 
                 - (1/(2* (1- square(rho) ))) * 
@@ -52,7 +52,7 @@ parameters {
 
 model {
     real tmp;
-    real y;
+    real d_y;
     for (n in 1:n_regions){
         for (m in 1:12){
             mu_t[n_regions,12] ~normal(20.0,100.0);
