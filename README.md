@@ -11,7 +11,7 @@ Notebooks:
 
 2. [Bayesian_MSM.ipynb](Bayesian_MSM.ipynb)
 
-3. [Overview.ipynb](Overview.ipynb) Raphael Shirley summarises the previous notebooks by Peter Hurley and implements a two dimensional Gaussian model.
+3. [3_Overview.ipynb](3_Overview.ipynb) Raphael Shirley summarises the previous notebooks by Peter Hurley and implements a two dimensional Gaussian model.
 
 4. [Bayesian_MSM_SD2.ipynb](Bayesian_MSM_SD2.ipynb) Steven freely fits the variance and shows aggreement with an assumed value.
 
