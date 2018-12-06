@@ -7,15 +7,18 @@ Eventually we aim to create a model that can be used to understand the impace of
 
 Notebooks:
 
-1. [Exploratory_analysis.ipynb](Exploratory_analysis.ipynb) Peter Hurley gives an overview of the data present.
+* [1_Exploratory_analysis.ipynb](1_Exploratory_analysis.ipynb) Peter Hurley gives an overview of the data present.
 
-2. [Bayesian_MSM.ipynb](Bayesian_MSM.ipynb)
+* [2_Bayesian_MSM.ipynb](2_Bayesian_MSM.ipynb)
 
-3. [3_Overview.ipynb](3_Overview.ipynb) Raphael Shirley summarises the previous notebooks by Peter Hurley and implements a two dimensional Gaussian model.
+* [3_Overview.ipynb](3_Overview.ipynb) Raphael Shirley summarises the previous notebooks by Peter Hurley and implements a two dimensional Gaussian model.
 
-4. [Bayesian_MSM_SD2.ipynb](Bayesian_MSM_SD2.ipynb) Steven freely fits the variance and shows aggreement with an assumed value.
+* [4_Bayesian_MSM_SD2.ipynb](4_Bayesian_MSM_SD2.ipynb) Steven freely fits the variance and shows aggreement with an assumed value.
 
-5. [Growth_curve_fitting.ipynb](Growth_curve_fitting.ipynb) Peter implements a one dimensional Gaussian model.
+* [5_Growth_curve_fitting.ipynb](5_Growth_curve_fitting.ipynb) Peter implements a one dimensional Gaussian model.
+
+* [6_Warming_impact.ipynb](6_Warming_impact.ipynb) Investigating impact of temperature increases on fitted two dimensional Gaussian model.
+
 
 ## Literature
 
