@@ -33,22 +33,13 @@ parameters {
     real mu_p[n_regions,12];
     //Wikipedia notation
     real y_norm[n_regions,12];
-    real sigma_t[n_regions,12];
-    real sigma_p[n_regions,12];
-    real rho[n_regions,12];
+    real<lower=0.0> sigma_t[n_regions,12];
+    real<lower=0.0> sigma_p[n_regions,12];
+    real<lower=-1.0, upper=+1.0> rho[n_regions,12];
     //real noise_sigma[n_regions];
-    //Other notation
-    //real sigma_tt[n_regions,12];
-    //real sigma_pp[n_regions,12];
-    //real sigma_tp[n_regions,12];
+
 }
 
-//transformed parameters {
-//vector[n_region] sigma[n_regions];
-//for (n in 1:n_regions){
-//sigma[n]=sqrt(sum(square(s_temp[n])*variance(d_temp[n])));
-//}
-//}
 
 model {
     real tmp;
