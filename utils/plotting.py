@@ -76,9 +76,8 @@ def plot_temp_precip_variation(fit, data):
                 rho = samples['rho'][k] if 'rho' in samples else None
                 norm = [samples['norm'][k]]
 
-                # data_ = data.copy()
-                # data['temp']
-                mean_yield_samples[k] = evaluate.compute_annual_yield_anom_6m_tp(data, mu_t, mu_p, sigma_t, sigma_p, norm, rho)
+                mean_yield_samples[k] = evaluate.compute_annual_yield_anom_6m_tp(data, mu_t, mu_p, sigma_t,
+                                                                                 sigma_p, norm, rho, t, p)
 
             mean_yield_anom[n, m] = np.nanmean(mean_yield_samples)
 

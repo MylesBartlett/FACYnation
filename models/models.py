@@ -4,7 +4,7 @@ Aliased pySTAN models
 import pickle
 
 import pystan
-from xidplus.stan_fit import stan_utility
+# from xidplus.stan_fit import stan_utility
 
 
 def uncorrelated_bivariate_gaussian_model() -> pystan.StanModel:

@@ -1,7 +1,7 @@
 import pickle
 import numpy as np
 
-from xidplus.stan_fit import stan_utility
+# from xidplus.stan_fit import stan_utility
 
 _VALID_PARAMS = ['mu_t', 'mu_p', 'sigma_t', 'sigma_p', 'norm', 'rho']
 

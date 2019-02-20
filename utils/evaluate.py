@@ -18,7 +18,7 @@ def yield_anomaly_6m_tp(temp_6m, precip_6m, mu_t, mu_p, sigma_t, sigma_p, norm, 
 
 
 def compute_annual_yield_anom_6m_tp(data: dict, mu_t, mu_p, sigma_t, sigma_p,
-                                    norm, rho=None, average=True):
+                                    norm, rho=None, average=True, t_inc=0, p_inc=0):
     """
     Compute mean yield anomaly for a model over regions and years.
     If a correlation coefficient (rho) is provided, the correlation between
@@ -47,8 +47,8 @@ def compute_annual_yield_anom_6m_tp(data: dict, mu_t, mu_p, sigma_t, sigma_p,
     for state in range(data['n_regions']):
         # loop over years
         for year in range(data['n_years']):
-            temp_6m = data['d_temp'][state, year, :]
-            precip_6m = data['d_precip'][state, year, :]
+            temp_6m = data['d_temp'][state, year, :] + t_inc
+            precip_6m = data['d_precip'][state, year, :] + p_inc
             yield_anomalies[state, year] = yield_anomaly_6m_tp(temp_6m, precip_6m, mu_t, mu_p,
                                                                sigma_t, sigma_p, norm, rho)
     if average:
