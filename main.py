@@ -18,15 +18,17 @@ if __name__ == '__main__':
     load_path = f'{save_path}.pkl'
     model = model_utils.load_model(load_path)
 
-    cv_results = validation.time_series_cv(model, data, args)
-    print(cv_results['test']['rrmse'])
+    # cv_results = validation.time_series_cv(model, data, args)
+    # print(cv_results['test']['rrmse'])
 
     # cv_results = validation.leave_p_out_cv(model, data, args)
     # print(cv_results['prediction_errors'])
 
-    # fit = model.sampling(data, chains=args.chains, iter=args.iter,
-    #                      verbose=args.verbose, seed=args.seed)
-    # print(fit)
+    fit = model.sampling(data, chains=args.chains, iter=args.iter,
+                         verbose=args.verbose, seed=args.seed)
+    print(fit)
+    ax = utils.plotting.plot_temp_precip_variation(fit, data)
+    ax.show()
     # #
     # samples = fit.extract()
     # utils.plotting.plot_per_region_yield_predictions(fit, data_loading.US_MAIZE_STATES)
