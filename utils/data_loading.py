@@ -57,7 +57,6 @@ def prepare_us_maize_data(month_start=3, month_end=9):
         'n_gf': 40,
         'temp': np.arange(0, 40, 1),
         'precip': np.arange(0, 200, 5),
-        'region_names': US_MAIZE_STATES
     }
 
     return data
