@@ -1,59 +1,69 @@
 import pandas as pd
 import numpy as np
 
-US_MAIZE_STATES = ['Indiana', 'Illinois', 'Ohio', 'Nebraska', 'Iowa', 'Minnesota']
 
+def load_temp_precip_data(crop: str, season: str, country, regions: list, month_start=3, month_end=9):
+    regions = [region for region in regions]
+    crop_lc = crop.lower()
+    crop_cap, season_cap = crop_lc.capitalize(), season.capitalize()
+    crop_season_country = [crop_cap, season, country] if season != ''\
+        else [crop_cap, country]
+    crop_season_country = '_'.join(crop_season_country)
 
-def prepare_us_maize_data(month_start=3, month_end=9):
-
-    assert month_start >= 0 and month_end >= 0
     if month_end < month_start:
         raise ValueError('Invalid month range')
     # Read in climate temperatures
-    clim_temp_maize = pd.read_table('./Crop_data_files/clim_file/temp_climatology_Maize.csv')
-    clim_temp_maize.rename(columns={'Unnamed: 0': 'Crop_season_location'}, inplace=True)
+    clim_temp_crop = pd.read_table(f'./Crop_data_files/clim_file/temp_climatology_{crop_cap}.csv')
+    clim_temp_crop.rename(columns={'Unnamed: 0': 'Crop_season_location'}, inplace=True)
     # Read in climate precipitation
-    clim_precip_maize = pd.read_table('./Crop_data_files/clim_file/precip_climatology_Maize.csv')
-    clim_precip_maize.rename(columns={'Unnamed: 0': 'Crop_season_location'}, inplace=True)
+    clim_precip_crop = pd.read_table(f'./Crop_data_files/clim_file/precip_climatology_{crop_cap}.csv')
+    clim_precip_crop.rename(columns={'Unnamed: 0': 'Crop_season_location'}, inplace=True)
     # Read in Yields
-    yields = pd.read_table('./Crop_data_files/Maize_median_yield_anoms.csv')
-
+    yields = pd.read_table(f'./Crop_data_files/{crop_lc}_median_yield_anoms.csv')
+    years = None
     # Read in and add back mean temperature to get real temperature values
-    temp_states = []
-    for i, s in enumerate(US_MAIZE_STATES):
-        maize_temp = pd.read_table('./Crop_data_files/maize_met_anoms/Maize_Spring_USA_' + s + '_temp_anom_real.csv')
+    temp_regions = []
+    for i, region in enumerate(regions):
+        maize_temp = pd.read_table(f'./Crop_data_files/{crop_lc}_met_anoms/{crop_season_country}'
+                                   f'_{region}_temp_anom_real.csv')
+
         maize_temp.rename(columns={'Unnamed: 0': 'Year'}, inplace=True)
-        tmp = maize_temp.iloc[:, 1:].add(
-            clim_temp_maize[clim_temp_maize['Crop_season_location'] == 'Maize_Spring_USA_' + US_MAIZE_STATES[0]].iloc[0, 1:, ])
-        temp_states.append(tmp)
-    temp_states = pd.concat(temp_states, keys=US_MAIZE_STATES)
+        if years is None:   # we need to know which yield years we have climatology data for
+            years = maize_temp['Year'].apply(str).values
+        # print(clim_temp_crop[f'{crop_season_country}_{region}'])
+        means = clim_temp_crop[clim_temp_crop['Crop_season_location']
+                               == f'{crop_season_country}_{region}'].iloc[0, 1:, ]
+        tmp = maize_temp.iloc[:, 1:].add(means)
+        temp_regions.append(tmp)
+    temp_regions = pd.concat(temp_regions, keys=regions)
 
     # Read in and add back mean precipitation to get real precipitation values
-    precip_states = []
-    for i, s in enumerate(US_MAIZE_STATES):
+    pecip_regions = []
+    for i, region in enumerate(regions):
         maize_precip = pd.read_table(
-            './Crop_data_files/maize_met_anoms/Maize_Spring_USA_' + s + '_precip_anom_real.csv')
+            f'./Crop_data_files/{crop_lc}_met_anoms/{crop_season_country}_{region}_precip_anom_real.csv')
         maize_precip.rename(columns={'Unnamed: 0': 'Year'}, inplace=True)
-        tmp = maize_precip.iloc[:, 1:].add(
-            clim_precip_maize[clim_precip_maize['Crop_season_location'] == 'Maize_Spring_USA_' + US_MAIZE_STATES[0]].iloc[0,
-            1:, ])
-        precip_states.append(tmp)
-    precip_states = pd.concat(precip_states, keys=US_MAIZE_STATES)
+        means = clim_precip_crop[clim_precip_crop['Crop_season_location']
+                                 == f'{crop_season_country}_{region}'].iloc[0, 1:, ]
+        tmp = maize_precip.iloc[:, 1:].add(means)
+        pecip_regions.append(tmp)
+    pecip_regions = pd.concat(pecip_regions, keys=regions)
 
-    n_years = np.array(yields[yields['Region'] == 'Maize_Spring_USA_Indiana'].iloc[0, 22:]).size
+    n_years = yields[years].shape[1]
     n_months = month_end - month_start
 
+    n_regions = len(regions)
+
     data = {
-        'n_regions': len(US_MAIZE_STATES),
+        'n_regions': n_regions,
         'n_years': n_years,
-        'd_temp': np.array(temp_states.iloc[:, month_start: month_end]).reshape(
-            len(US_MAIZE_STATES), -1, n_months
-        ).astype(float),
-        'd_precip': np.array(precip_states.iloc[:, month_start: month_end]).reshape(
-            len(US_MAIZE_STATES), -1, n_months).astype(float),
+        'd_temp': np.array(temp_regions.iloc[:, month_start: month_end]).reshape(
+            n_regions, -1, n_months).astype(float),
+        'd_precip': np.array(pecip_regions.iloc[:, month_start: month_end]).reshape(
+            n_regions, -1, n_months).astype(float),
         'd_yields': np.array(yields[yields["Region"].isin(
-            [f'Maize_Spring_USA_{s}' for s in US_MAIZE_STATES]
-        )].iloc[:, 22:]).astype(float) + 6,
+            [f'{crop_season_country}_{region}' for region in regions]
+        )][years]).astype(float) + 6,
         'n_gf': 40,
         'temp': np.arange(0, 40, 1),
         'precip': np.arange(0, 200, 5),
