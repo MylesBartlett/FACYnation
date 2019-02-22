@@ -49,7 +49,7 @@ def plot_per_region_yield_predictions(fit, regions):
         plt.title(regions[s])
 
 
-def plot_temp_precip_variation(fit, data):
+def plot_temp_precip_variation(fit, data, save_path=''):
     T_inc = np.linspace(-10, 10, 50)
     P_inc = np.linspace(-100, 100, 50)
 
@@ -90,5 +90,7 @@ def plot_temp_precip_variation(fit, data):
     cbar.set_label('Yield [tonnes ha$^{-1}$]')
     ax.set_xlabel('$T_{inc}$ [K]')
     ax.set_ylabel('$P_{inc}$ [mm]')
+    if save_path != '':
+        plt.savefig(save_path)
 
     return ax

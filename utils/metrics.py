@@ -12,4 +12,4 @@ def rrmse(y_pred, y_true):
 
 
 def nash_sutcliffe_eff(y_pred, y_true):
-    return 1 - (metrics.mean_squared_error(y_pred, y_true) / np.var(y_true))
+    return 1 - ((y_pred - y_true)**2).sum() / ((y_true - np.mean(y_true))**2).sum()

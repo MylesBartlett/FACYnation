@@ -57,6 +57,7 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     data = {
         'n_regions': n_regions,
         'n_years': n_years,
+        'n_months': n_months,
         'd_temp': np.array(temp_regions.iloc[:, month_start: month_end]).reshape(
             n_regions, -1, n_months).astype(float),
         'd_precip': np.array(pecip_regions.iloc[:, month_start: month_end]).reshape(
