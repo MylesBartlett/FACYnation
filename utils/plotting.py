@@ -50,19 +50,19 @@ def plot_per_region_yield_predictions(fit, regions):
 
 
 def plot_temp_precip_variation(fit, data):
-    T_incs_2 = np.linspace(-10, 10, 50)
-    P_incs_2 = np.linspace(-100, 100, 50)
+    T_inc = np.linspace(-10, 10, 50)
+    P_inc = np.linspace(-100, 100, 50)
 
     samples = fit.extract()
 
     take_100 = np.random.choice([0,1],
                                 size=len(samples['mu_t']),
                                 p=(1-100/len(samples['mu_t']), 100/len(samples['mu_t'])))
-    mean_yield_anom = np.full((len(T_incs_2), len(P_incs_2)), np.nan)
+    mean_yield_anom = np.full((len(T_inc), len(P_inc)), np.nan)
 
-    for n, t in enumerate(T_incs_2):
-        print("{} out of {}".format(n, len(T_incs_2)))
-        for m, p in enumerate(P_incs_2):
+    for n, t in enumerate(T_inc):
+        print("{} out of {}".format(n, len(T_inc)))
+        for m, p in enumerate(P_inc):
             mean_yield_samples = np.full(len(samples['mu_t']), np.nan)
             for k in np.arange(len(samples['mu_t'])):
                 if not take_100[k]:
@@ -77,14 +77,14 @@ def plot_temp_precip_variation(fit, data):
                 norm = [samples['norm'][k]]
 
                 mean_yield_samples[k] = evaluate.compute_annual_yield_anom_6m_tp(data, mu_t, mu_p, sigma_t,
-                                                                                 sigma_p, norm, rho, t, p)
+                                                                                 sigma_p, norm, rho, t_inc=t, p_inc=p)
 
             mean_yield_anom[n, m] = np.nanmean(mean_yield_samples)
 
     fig, ax = plt.subplots()
 
     im = plt.imshow(np.flip(mean_yield_anom.T, axis=0), cmap='RdBu',
-                    extent=[T_incs_2[0], T_incs_2[-1], P_incs_2[0], P_incs_2[-1]],
+                    extent=[T_inc[0], T_inc[-1], P_inc[0], P_inc[-1]],
                     aspect="auto")  # drawing the function
     cbar = fig.colorbar(im)  # adding the colorbar on the right
     cbar.set_label('Yield [tonnes ha$^{-1}$]')

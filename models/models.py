@@ -15,7 +15,7 @@ def uncorrelated_bivariate_gaussian_model() -> pystan.StanModel:
     Returns:
         pySTAN model of an uncorrelated bivariate normal distribution.
     """
-    return pystan.StanModel(file='./stan/2d-gaussian.stan')
+    return pystan.StanModel(file='./models/stan/2d-gaussian.stan')
 
 
 def correlated_bivariate_gaussian_model() -> pystan.StanModel:
@@ -26,7 +26,7 @@ def correlated_bivariate_gaussian_model() -> pystan.StanModel:
     Returns:
         pySTAN model of an correlated bivariate normal distribution.
     """
-    return pystan.StanModel(file='./stan/2d-gaussian_with_correlation.stan')
+    return pystan.StanModel(file='./models/stan/2d-gaussian_with_correlation.stan')
 
 
 _MODELS = {
