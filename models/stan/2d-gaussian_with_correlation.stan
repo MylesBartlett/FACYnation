@@ -7,9 +7,10 @@ functions {
                real sigma_p, 
                real rho,
                real norm){
-        real dy[6];
+        int n_months = size(temp);
+        real dy[n_months];
         int reci;
-        for (i in 1:6){
+        for (i in 1:n_months){
             reci = i;
             //dy[reci]=norm*exp(-0.5*( square( (precip[reci]-mu_p)/sigma_p)  ) );
             //dy[reci]=norm*exp(-0.5*( square( (temp[reci]-mu_t)/sigma_t)  ) );
@@ -27,7 +28,7 @@ data {
     int<lower=0> n_regions;
     int<lower=0> n_years;
     int<lower=0> n_months;
-    real d_temp[n_regions,n_years, n_months];
+    real d_temp[n_regions, n_years, n_months];
     real d_precip[n_regions,n_years, n_months];
     real d_yields[n_regions, n_years];
     int n_gf;

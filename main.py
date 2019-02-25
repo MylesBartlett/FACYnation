@@ -18,15 +18,11 @@ if __name__ == '__main__':
     soybean_usa = ['Illinois', 'Indiana', 'Iowa', 'Minnesota', 'Missouri', 'NorthDakota', 'Ohio', 'SouthDakota']
     rice_mid_china = ['Anhui', 'Chongqing', 'Heilongjiang', 'Hubei', 'Hunan', 'Jiangsu', 'Jilin', 'Liaoning']
 
-    data = data_loading.load_temp_precip_data('Soybean', '', 'USA', soybean_usa)
-
-    # print(np.isnan(data['d_yields']))
-    # print(np.isnan(data['d_temp']))
-    # print(data)
+    data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions, month_start=0, month_end=12)
     save_path = f'models/saved_models/{args.model}_save'
     model_utils.save_model(model, save_path)
-    # # Load model to circumvent compile time
-    # load_path = f'{save_path}.pkl'
+    # # # Load model to circumvent compile time
+    load_path = f'{save_path}.pkl'
     model = model_utils.load_model(load_path)
 
     # cv_results = validation.time_series_cv(model, data, args)
@@ -45,14 +41,14 @@ if __name__ == '__main__':
 
     fit = model.sampling(data, chains=args.chains, iter=args.iter,
                          verbose=args.verbose, seed=args.seed)
-    # print(fit)
-    ax = utils.plotting.plot_temp_precip_variation(fit, data)
-    ax.plot()
-    plt.show()
+    # # print(fit)
+    # ax = utils.plotting.plot_temp_precip_variation(fit, data)
+    # ax.plot()
+    # plt.show()
     # #
     # samples = fit.extract()
-    # utils.plotting.plot_per_region_yield_predictions(fit, us_maize_regions)
-    # plt.show()
+    utils.plotting.plot_per_region_yield_predictions(fit, us_maize_regions)
+    plt.show()
     # #
     # samples = fit.extract()
     # pm = model_utils.extract_parameter_means(samples)

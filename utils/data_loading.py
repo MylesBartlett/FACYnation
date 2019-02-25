@@ -26,7 +26,6 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     for i, region in enumerate(regions):
         maize_temp = pd.read_table(f'./Crop_data_files/{crop_lc}_met_anoms/{crop_season_country}'
                                    f'_{region}_temp_anom_real.csv')
-
         maize_temp.rename(columns={'Unnamed: 0': 'Year'}, inplace=True)
         if years is None:   # we need to know which yield years we have climatology data for
             years = maize_temp['Year'].apply(str).values
@@ -51,7 +50,6 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
 
     n_years = yields[years].shape[1]
     n_months = month_end - month_start
-
     n_regions = len(regions)
 
     data = {
