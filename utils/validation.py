@@ -36,11 +36,11 @@ def _cross_validate(model, data, cross_validator, args):
 
 
 def _cv_evaluate(param_means, data, cv_dict):
-    y_pred = evaluate.compute_annual_yield_anom_6m_tp(data, param_means['mu_t'], param_means['mu_p'],
-                                                      param_means['sigma_t'], param_means['sigma_p'],
-                                                      [param_means['norm']],
-                                                      param_means['rho'] if 'rho' in param_means else None,
-                                                      average=False)
+    y_pred = evaluate.compute_annual_yield_anom_tp(data, param_means['mu_t'], param_means['mu_p'],
+                                                   param_means['sigma_t'], param_means['sigma_p'],
+                                                   [param_means['norm']],
+                                                   param_means['rho'] if 'rho' in param_means else None,
+                                                   average=False)
     y_true = data['d_yields']
     rrmse = utils.metrics.rrmse(y_pred, y_true)
     ns_eff = utils.metrics.nash_sutcliffe_eff(y_pred, y_true)

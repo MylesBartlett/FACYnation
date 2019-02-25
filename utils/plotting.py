@@ -12,8 +12,8 @@ def _temp_precip_grid(temp_range, preip_range, mu_t, mu_p, sigma_t, sigma_p,
     def z_func(X, Y):
         temp_6m = np.full(6, X)
         precip_6m = np.full(6, Y)
-        return utils.evaluate.yield_anomaly_6m_tp(temp_6m, precip_6m, mu_t, mu_p,
-                                                  sigma_t, sigma_p, norm, rho)
+        return utils.evaluate.yield_anomaly_tp(temp_6m, precip_6m, mu_t, mu_p,
+                                               sigma_t, sigma_p, norm, rho)
 
     z_func = np.vectorize(z_func)
     Z = z_func(X, Y)  # evaluation of the function on the grid
@@ -76,8 +76,8 @@ def plot_temp_precip_variation(fit, data, save_path=''):
                 rho = samples['rho'][k] if 'rho' in samples else None
                 norm = [samples['norm'][k]]
 
-                mean_yield_samples[k] = utils.evaluate.compute_annual_yield_anom_6m_tp(data, mu_t, mu_p, sigma_t,
-                                                                                       sigma_p, norm, rho, t_inc=t, p_inc=p)
+                mean_yield_samples[k] = utils.evaluate.compute_annual_yield_anom_tp(data, mu_t, mu_p, sigma_t,
+                                                                                    sigma_p, norm, rho, t_inc=t, p_inc=p)
 
             mean_yield_anom[n, m] = np.nanmean(mean_yield_samples)
 
@@ -99,8 +99,8 @@ def plot_temp_precip_variation(fit, data, save_path=''):
 def compare_annual_mean_yield_prediction(fit, data, title: str):
     samples = fit.extract()
     pm = utils.model_utils.extract_parameter_means(samples)
-    y_pred = utils.evaluate.compute_annual_yield_anom_6m_tp(data, pm['mu_t'], pm['mu_p'], pm['sigma_t'],
-                                                            pm['sigma_p'], [pm['norm']], pm['rho'], average=False)
+    y_pred = utils.evaluate.compute_annual_yield_anom_tp(data, pm['mu_t'], pm['mu_p'], pm['sigma_t'],
+                                                         pm['sigma_p'], [pm['norm']], pm['rho'], average=False)
     y_pred_mean_over_regions = np.mean(y_pred, axis=0)
     y_true_mean_over_regions = np.mean(data['d_yields'], axis=0)
     years = 1980 + np.arange(data['n_years'])

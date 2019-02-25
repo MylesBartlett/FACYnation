@@ -2,7 +2,7 @@ import numpy as np
 from utils import distributions as dist
 
 
-def yield_anomaly_6m_tp(temp, precip, mu_t, mu_p, sigma_t, sigma_p, norm, rho=None):
+def yield_anomaly_tp(temp, precip, mu_t, mu_p, sigma_t, sigma_p, norm, rho=None):
     """Take six months of T and P and return yield for given params.
 
     This should be identical to the function in the STAN model
@@ -18,8 +18,8 @@ def yield_anomaly_6m_tp(temp, precip, mu_t, mu_p, sigma_t, sigma_p, norm, rho=No
     return np.sum(dy)
 
 
-def compute_annual_yield_anom_6m_tp(data: dict, mu_t, mu_p, sigma_t, sigma_p,
-                                    norm, rho=None, t_inc=0, p_inc=0, average=True):
+def compute_annual_yield_anom_tp(data: dict, mu_t, mu_p, sigma_t, sigma_p,
+                                 norm, rho=None, t_inc=0, p_inc=0, average=True):
     """
     Compute mean yield anomaly for a model over regions and years.
     If a correlation coefficient (rho) is provided, the correlation between
@@ -50,8 +50,8 @@ def compute_annual_yield_anom_6m_tp(data: dict, mu_t, mu_p, sigma_t, sigma_p,
         for year in range(data['n_years']):
             temp = data['d_temp'][state, year, :] + t_inc
             precip = data['d_precip'][state, year, :] + p_inc
-            yield_anomalies[state, year] = yield_anomaly_6m_tp(temp, precip, mu_t, mu_p,
-                                                               sigma_t, sigma_p, norm, rho)
+            yield_anomalies[state, year] = yield_anomaly_tp(temp, precip, mu_t, mu_p,
+                                                            sigma_t, sigma_p, norm, rho)
     if average:
         yield_anomalies = np.nanmean(yield_anomalies)
 

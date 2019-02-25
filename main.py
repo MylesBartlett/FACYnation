@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     rice_mid_china = ['Anhui', 'Chongqing', 'Heilongjiang', 'Hubei', 'Hunan', 'Jiangsu', 'Jilin', 'Liaoning']
 
-    data = data_loading.load_temp_precip_data('Soybean', '', 'USA', soybean_usa, month_start=2, month_end=6)
+    data = data_loading.load_temp_precip_data('Rice', 'Mid', 'China', rice_mid_china, range(0, 6))
     save_path = f'models/saved_models/{args.model}_save'
 
     # model_utils.save_model(model, save_path)

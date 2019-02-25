@@ -29,7 +29,7 @@ data {
     int<lower=0> n_years;
     int<lower=0> n_months;
     real d_temp[n_regions, n_years, n_months];
-    real d_precip[n_regions,n_years, n_months];
+    real d_precip[n_regions, n_years, n_months];
     real d_yields[n_regions, n_years];
     int n_gf;
     real temp[n_gf];

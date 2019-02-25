@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-def load_temp_precip_data(crop: str, season: str, country, regions: list, month_start=3, month_end=9):
+def load_temp_precip_data(crop: str, season: str, country, regions: list, month_indexes):
     regions = [region for region in regions]
     crop_lc = crop.lower()
     crop_cap, season_cap = crop_lc.capitalize(), season.capitalize()
@@ -10,8 +10,6 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
         else [crop_cap, country]
     crop_season_country = '_'.join(crop_season_country)
 
-    if month_end < month_start:
-        raise ValueError('Invalid month range')
     # Read in climate temperatures
     clim_temp_crop = pd.read_table(f'./Crop_data_files/clim_file/temp_climatology_{crop_cap}.csv')
     clim_temp_crop.rename(columns={'Unnamed: 0': 'Crop_season_location'}, inplace=True)
@@ -49,7 +47,7 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     pecip_regions = pd.concat(pecip_regions, keys=regions)
 
     n_years = yields[years].shape[1]
-    n_months = month_end - month_start
+    n_months = len(month_indexes)
     n_regions = len(regions)
 
     d_yields = yields[yields["Region"].isin(
@@ -59,9 +57,9 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     d_yields.dropna(axis=1, inplace=True)
 
     # Drop years with missing yield values
-    d_temp = np.array(temp_regions.iloc[:, month_start: month_end]).reshape(
+    d_temp = np.array(temp_regions.iloc[:, month_indexes]).reshape(
             n_regions, -1, n_months).astype(float)
-    d_precip = np.array(pecip_regions.iloc[:, month_start: month_end]).reshape(
+    d_precip = np.array(pecip_regions.iloc[:, month_indexes]).reshape(
         n_regions, -1, n_months).astype(float)
     d_temp = np.delete(d_temp, missing_year_inds, axis=1)
     d_precip = np.delete(d_precip, missing_year_inds, axis=1)
