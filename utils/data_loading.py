@@ -52,17 +52,27 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     n_months = month_end - month_start
     n_regions = len(regions)
 
+    d_yields = yields[yields["Region"].isin(
+            [f'{crop_season_country}_{region}' for region in regions])][years]
+    missing_year_inds = d_yields.isna().any().nonzero()[0]
+    n_years -= len(missing_year_inds)
+    d_yields.dropna(axis=1, inplace=True)
+
+    # Drop years with missing yield values
+    d_temp = np.array(temp_regions.iloc[:, month_start: month_end]).reshape(
+            n_regions, -1, n_months).astype(float)
+    d_precip = np.array(pecip_regions.iloc[:, month_start: month_end]).reshape(
+        n_regions, -1, n_months).astype(float)
+    d_temp = np.delete(d_temp, missing_year_inds, axis=1)
+    d_precip = np.delete(d_precip, missing_year_inds, axis=1)
+
     data = {
         'n_regions': n_regions,
         'n_years': n_years,
         'n_months': n_months,
-        'd_temp': np.array(temp_regions.iloc[:, month_start: month_end]).reshape(
-            n_regions, -1, n_months).astype(float),
-        'd_precip': np.array(pecip_regions.iloc[:, month_start: month_end]).reshape(
-            n_regions, -1, n_months).astype(float),
-        'd_yields': np.array(yields[yields["Region"].isin(
-            [f'{crop_season_country}_{region}' for region in regions]
-        )][years]).astype(float) + 6,
+        'd_temp': d_temp,
+        'd_precip': d_precip,
+        'd_yields': np.array(d_yields).astype(float) + 6,
         'n_gf': 40,
         'temp': np.arange(0, 40, 1),
         'precip': np.arange(0, 200, 5),

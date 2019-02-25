@@ -25,6 +25,7 @@ def _cross_validate(model, data, cross_validator, args):
 
         rrmse_train, ns_eff_train, explained_var_train, r2_train = _cv_evaluate(param_means, train_data,
                                                                                 cv_results['train'])
+
         rrmse_test, ns_eff_test, explained_var_test, r2_test = _cv_evaluate(param_means, test_data,
                                                                             cv_results['test'])
 

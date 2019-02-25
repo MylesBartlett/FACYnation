@@ -2,16 +2,17 @@ import numpy as np
 from utils import distributions as dist
 
 
-def yield_anomaly_6m_tp(temp_6m, precip_6m, mu_t, mu_p, sigma_t, sigma_p, norm, rho=None):
+def yield_anomaly_6m_tp(temp, precip, mu_t, mu_p, sigma_t, sigma_p, norm, rho=None):
     """Take six months of T and P and return yield for given params.
 
     This should be identical to the function in the STAN model
     """
+    n_months = len(temp)
     if len(norm) == 1:
-        norm = norm * np.ones(6)
-    dy = np.zeros(6)
-    for month in range(6):
-        dy[month] = norm[month] * dist.bivariate_normal(temp_6m[month], precip_6m[month],
+        norm = norm * np.ones(n_months)
+    dy = np.zeros(n_months)
+    for month in range(n_months):
+        dy[month] = norm[month] * dist.bivariate_normal(temp[month], precip[month],
                                                         mu_t, mu_p, sigma_t, sigma_p, rho)
 
     return np.sum(dy)
@@ -47,9 +48,9 @@ def compute_annual_yield_anom_6m_tp(data: dict, mu_t, mu_p, sigma_t, sigma_p,
     for state in range(data['n_regions']):
         # loop over years
         for year in range(data['n_years']):
-            temp_6m = data['d_temp'][state, year, :] + t_inc
-            precip_6m = data['d_precip'][state, year, :] + p_inc
-            yield_anomalies[state, year] = yield_anomaly_6m_tp(temp_6m, precip_6m, mu_t, mu_p,
+            temp = data['d_temp'][state, year, :] + t_inc
+            precip = data['d_precip'][state, year, :] + p_inc
+            yield_anomalies[state, year] = yield_anomaly_6m_tp(temp, precip, mu_t, mu_p,
                                                                sigma_t, sigma_p, norm, rho)
     if average:
         yield_anomalies = np.nanmean(yield_anomalies)
