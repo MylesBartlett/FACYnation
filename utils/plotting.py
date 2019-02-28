@@ -1,6 +1,7 @@
 import numpy as np
 import utils
 import pylab as plt
+import pandas as pd
 
 
 def _temp_precip_grid(temp_range, preip_range, mu_t, mu_p, sigma_t, sigma_p,
@@ -96,6 +97,37 @@ def plot_temp_precip_variation(fit, data, save_path=''):
     return ax
 
 
+def plot_anomaly_trend(crop, season, country, region='Indiana'):
+    key = [crop, season, country, region] if season != ''\
+        else [crop, country, region]
+    key = '_'.join(key)
+
+    anom_yields = pd.read_table(f'../Crop_data_files/{crop}_median_yield_anoms.csv')
+    real_yields = pd.read_csv(f'../Crop_data_files/{crop}_yield_obs_timeseries.csv')
+
+    anom_yields = anom_yields.loc[anom_yields['Region'] == key]
+    real_yields = real_yields.loc[real_yields['Region'] == key]
+
+    # print(anom_yields.columns)
+    anom_yields = anom_yields.iloc[:, 2:].values.squeeze()
+    # print(real_yields.columns)
+    real_yields = real_yields.iloc[:, 1:].values.squeeze()
+
+    x = np.arange(1960, 2015, 1)
+    plt.plot(x, real_yields, label='Yield', color='k', marker='s')
+    plt.plot(np.unique(x), np.poly1d(np.polyfit(x, real_yields, 1))(np.unique(x)),
+             label='Trend', alpha=0.5, color='k', ls='--')
+    plt.plot(x, anom_yields, color='b', marker='s', label='Anomalies (Detrended Yield')
+    plt.xlabel('Year')
+    plt.ylabel(r'Maize yield (tons ha$^{-1}$)')
+    plt.xticks(np.arange(1960, 2015, 5))
+    plt.title('Indiana')
+    plt.legend()
+    plt.show()
+
+    return anom_yields, real_yields
+
+
 def compare_annual_mean_yield_prediction(fit, data, title: str):
     samples = fit.extract()
     pm = utils.model_utils.extract_parameter_means(samples)
@@ -110,7 +142,3 @@ def compare_annual_mean_yield_prediction(fit, data, title: str):
     plt.xlabel('Year')
     plt.ylabel('Yield anomaly')
     plt.legend()
-
-
-
-

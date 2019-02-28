@@ -70,6 +70,8 @@ def parse_arguments(config_file):
 
 def get_section(parser, name):
     """Get section of the config parser. Creates section if it doesn't exist"""
-    if not parser.has_section(name):
-        parser.add_section(name)
+    for section in parser.sections():
+        if section.lower() == name.lower():
+            return parser[section]
+    parser.add_section(name)
     return parser[name]

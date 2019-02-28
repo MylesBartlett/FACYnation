@@ -20,41 +20,53 @@ if __name__ == '__main__':
 
     rice_mid_china = ['Anhui', 'Chongqing', 'Heilongjiang', 'Hubei', 'Hunan', 'Jiangsu', 'Jilin', 'Liaoning']
 
-    data = data_loading.load_temp_precip_data('Rice', 'Mid', 'China', rice_mid_china, range(0, 6))
+    data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions, range(3, 9))
     save_path = f'models/saved_models/{args.model}_save'
 
-    # model_utils.save_model(model, save_path)
     # # # Load model to circumvent compile time
     load_path = f'{save_path}.pkl'
     model = model_utils.load_model(load_path)
 
-    # n_splits = 5
-    # cv_results = validation.time_series_cv(model, data, args, n_splits=n_splits)
-    #
-    # plt.plot(range(n_splits), cv_results['test']['rmse'])
-    # plt.show()
-
-
-    # mean_rrmse = np.mean(cv_results['test']['rrmse'])
-    # mean_ns = np.mean(cv_results['test']['ns_eff'])
-    # mean_explained_var = np.mean(cv_results['test']['explained_var'])
-    # mean_r2 = np.mean(cv_results['test']['r2'])
-
-    # print('Mean RRMSE: ', mean_rrmse)
-    # print('Mean NS:', mean_ns)
-    # print('Mean Explained Var: ', mean_explained_var)
-    # print('Mean R2: ', mean_r2)
-    #
-    # cv_results = validation.leave_p_out_cv(model, data, args)
-    # print(cv_results['prediction_errors'])
-
     fit = model.sampling(data, chains=args.chains, iter=args.iter,
                          verbose=args.verbose, seed=args.seed)
-    #
-    utils.plotting.compare_annual_mean_yield_prediction(fit, data, 'United States - Wheat (Winter)')
+    print(fit)
+
+    # n_splits = 34
+    cv_results = validation.leave_p_out_cv(model, data, args, p=1)
+
+    mean_rmse = np.mean(cv_results['test']['rmse'])
+    mean_rrmse = np.mean(cv_results['test']['rrmse'])
+    mean_ns = np.mean(cv_results['test']['ns_eff'])
+    mean_explained_var = np.mean(cv_results['test']['explained_var'])
+    mean_r2 = np.mean(cv_results['test']['r2'])
+
+    print('Mean RMSE: ', mean_rmse)
+    print('Mean RRMSE: ', mean_rrmse)
+    print('Mean NS:', mean_ns)
+    print('Mean Explained Var: ', mean_explained_var)
+    print('Mean R2: ', mean_r2)
+
+    print(cv_results['test']['predicted_yields'])
+    print(cv_results['test']['actual_yields'])
+    plt.plot(np.arange(1980, 2015), cv_results['test']['predicted_yields'],
+             marker='s', color='b', label='Predicted Yield')
+    plt.plot(np.arange(1980, 2015), cv_results['test']['actual_yields'],
+             marker='s', color='k', label='Observed Yield')
+    plt.xlabel('Year')
+    plt.ylabel('Yield (tonnes ha$^{-1}$)')
+    plt.legend()
+    plt.savefig('./figures/LLO_us_maize.pdf')
+    plt.savefig('./figures/LLO_us_maize.png')
     plt.show()
-    plt.savefig('./figures/Annual_Mean_Anom_Winter_Wheat_USA_6m')
-    plt.savefig('./figures/Annual_Mean_Anom_Winter_Wheat_USA_6m.png')
+
+
+    # fit = model.sampling(data, chains=args.chains, iter=args.iter,
+    #                      verbose=args.verbose, seed=args.seed)
+    # #
+    # utils.plotting.compare_annual_mean_yield_prediction(fit, data, 'United States - Wheat (Winter)')
+    # plt.show()
+    # plt.savefig('./figures/Annual_Mean_Anom_Winter_Wheat_USA_6m')
+    # plt.savefig('./figures/Annual_Mean_Anom_Winter_Wheat_USA_6m.png')
 
     # # print(fit)
     # ax = utils.plotting.plot_temp_precip_variation(fit, data)
@@ -64,8 +76,8 @@ if __name__ == '__main__':
     # plt.show()
     # #
     # samples = fit.extract()
-    utils.plotting.plot_per_region_yield_predictions(fit, data, soybean_usa)
-    plt.show()
+    # utils.plotting.plot_per_region_yield_predictions(fit, data, soybean_usa)
+    # plt.show()
     # #
     # samples = fit.extract()
     # pm = model_utils.extract_parameter_means(samples)

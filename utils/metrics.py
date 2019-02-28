@@ -7,7 +7,7 @@ def rmse(y_pred, y_true):
 
 
 def rrmse(y_pred, y_true):
-    norm_factor = 1 / np.ptp(y_pred)
+    norm_factor = 1 / np.ptp(y_true)
     return norm_factor * rmse(y_pred, y_true)
 
 
