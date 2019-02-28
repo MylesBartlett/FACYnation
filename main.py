@@ -23,7 +23,7 @@ if __name__ == '__main__':
     data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions, range(3, 9))
     save_path = f'models/saved_models/{args.model}_save'
 
-    # # # Load model to circumvent compile time
+    # # Load model to circumvent compile time
     load_path = f'{save_path}.pkl'
     model = model_utils.load_model(load_path)
 
@@ -31,9 +31,10 @@ if __name__ == '__main__':
                          verbose=args.verbose, seed=args.seed)
     print(fit)
 
-    # n_splits = 34
-    cv_results = validation.leave_p_out_cv(model, data, args, p=1)
-
+    cv_results = validation.sliding_window_cv(None, data, args)
+    # # n_splits = 34
+    # cv_results = validation.leave_p_out_cv(model, data, args, p=1)
+    #
     mean_rmse = np.mean(cv_results['test']['rmse'])
     mean_rrmse = np.mean(cv_results['test']['rrmse'])
     mean_ns = np.mean(cv_results['test']['ns_eff'])
@@ -55,10 +56,9 @@ if __name__ == '__main__':
     plt.xlabel('Year')
     plt.ylabel('Yield (tonnes ha$^{-1}$)')
     plt.legend()
-    plt.savefig('./figures/LLO_us_maize.pdf')
-    plt.savefig('./figures/LLO_us_maize.png')
+    plt.savefig('./figures/sliding_window_us_maize.pdf')
+    plt.savefig('./figures/sliding_window_us_maize.png')
     plt.show()
-
 
     # fit = model.sampling(data, chains=args.chains, iter=args.iter,
     #                      verbose=args.verbose, seed=args.seed)

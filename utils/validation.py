@@ -13,8 +13,6 @@ def _cross_validate(model, data, cross_validator, args):
     cv_results = {'train': {key: [] for key in cv_values},
                   'test': {key: [] for key in cv_values}}
 
-    # metrics = [utils.metrics.rrmse, utils.metrics.nash_sutcliffe_eff]
-
     for i, (train_index, test_index) in enumerate(cross_validator.split(data['d_yields'][0])):
         train_data = extract_data_by_year_index(data, train_index)
         test_data = extract_data_by_year_index(data, test_index)
@@ -61,6 +59,19 @@ def _cv_evaluate(param_means, data, cv_dict):
     return rmse, rrmse, ns_eff, explained_var, r2
 
 
+class CenteredWindowSplit:
+
+    def __init__(self, radius=1):
+        self.radius = radius
+
+    def split(self, data):
+        n_samples = len(data)
+        for test_index in range(n_samples):
+            window = range(max(0, test_index-self.radius), min(test_index+self.radius+1, n_samples))
+            train_indexes = list(set(range(n_samples)) - set(window))
+            yield train_indexes, [test_index]
+
+
 def time_series_cv(model, data, args, n_splits=5):
     cross_validator = ms.TimeSeriesSplit(n_splits=n_splits)
     return _cross_validate(model, data, cross_validator, args)
@@ -68,4 +79,9 @@ def time_series_cv(model, data, args, n_splits=5):
 
 def leave_p_out_cv(model, data, args, p=3):
     cross_validator = ms.LeavePOut(p=p)
+    return _cross_validate(model, data, cross_validator, args)
+
+
+def sliding_window_cv(model, data, args, r=1):
+    cross_validator = CenteredWindowSplit(radius=r)
     return _cross_validate(model, data, cross_validator, args)
