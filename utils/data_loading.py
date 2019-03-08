@@ -3,7 +3,6 @@ import numpy as np
 
 
 def load_temp_precip_data(crop: str, season: str, country, regions: list, month_indexes):
-    regions = [region for region in regions]
     crop_season_country = [crop, season, country] if season != ''\
         else [crop, country]
     crop_season_country = '_'.join(crop_season_country)
@@ -25,9 +24,8 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
         maize_temp.rename(columns={'Unnamed: 0': 'Year'}, inplace=True)
         if years is None:   # we need to know which yield years we have climatology data for
             years = maize_temp['Year'].apply(str).values
-        # print(clim_temp_crop[f'{crop_season_country}_{region}'])
         means = clim_temp_crop[clim_temp_crop['Crop_season_location']
-                               == f'{crop_season_country}_{region}'].iloc[0, 1:, ]
+                               == f'{crop_season_country}_{regions[i]}'].iloc[0, 1:, ]
         tmp = maize_temp.iloc[:, 1:].add(means)
         temp_regions.append(tmp)
     temp_regions = pd.concat(temp_regions, keys=regions)
@@ -39,7 +37,7 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
             f'./Crop_data_files/{crop}_met_anoms/{crop_season_country}_{region}_precip_anom_real.csv')
         maize_precip.rename(columns={'Unnamed: 0': 'Year'}, inplace=True)
         means = clim_precip_crop[clim_precip_crop['Crop_season_location']
-                                 == f'{crop_season_country}_{region}'].iloc[0, 1:, ]
+                                 == f'{crop_season_country}_{regions[i]}'].iloc[0, 1:, ]
         tmp = maize_precip.iloc[:, 1:].add(means)
         pecip_regions.append(tmp)
     pecip_regions = pd.concat(pecip_regions, keys=regions)
@@ -68,13 +66,25 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
         'n_months': n_months,
         'd_temp': d_temp,
         'd_precip': d_precip,
-        'd_yields': np.array(d_yields).astype(float) + 9.7,   # adjust for current values (this adjustment factor only applies to USA Maize)
+        'd_yields': np.array(d_yields).astype(float) + 9.75,   # adjust for current values (this adjustment factor only applies to USA Maize)
         'n_gf': 40,
         'temp': np.arange(0, 40, 1),
         'precip': np.arange(0, 200, 5),
     }
 
     return data
+
+
+def batch_data(data):
+    x_cat = np.concatenate((data['d_temp'], data['d_precip']), -1)
+    x_annual = x_cat.reshape(data['n_years'] * data['n_regions'], -1)
+
+    batched_data = {
+        'X': x_annual,
+        'y': np.array(data['d_yields']).flatten()
+    }
+
+    return batched_data
 
 
 def extract_data_by_year_index(data, indexes):

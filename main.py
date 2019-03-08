@@ -5,6 +5,13 @@ import pylab as plt
 import utils.plotting
 import numpy as np
 import models.models
+from sklearn.linear_model import LinearRegression, RidgeCV
+from sklearn.model_selection import train_test_split, LeavePOut, TimeSeriesSplit
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import StandardScaler
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels \
+    import RBF, WhiteKernel, RationalQuadratic, ExpSineSquared
 
 _DEFAULT_CONFIG = 'run_configs/corr_bvg.ini'
 
@@ -21,20 +28,27 @@ if __name__ == '__main__':
     rice_mid_china = ['Anhui', 'Chongqing', 'Heilongjiang', 'Hubei', 'Hunan', 'Jiangsu', 'Jilin', 'Liaoning']
 
     data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions, range(3, 9))
+
+
     save_path = f'models/saved_models/{args.model}_save'
 
     # # Load model to circumvent compile time
     load_path = f'{save_path}.pkl'
     model = model_utils.load_model(load_path)
-
-    fit = model.sampling(data, chains=args.chains, iter=args.iter,
-                         verbose=args.verbose, seed=args.seed)
-    print(fit)
-
-    cv_results = validation.sliding_window_cv(None, data, args)
-    # # n_splits = 34
-    # cv_results = validation.leave_p_out_cv(model, data, args, p=1)
+    #     #
+        # fit = model.sampling(data, chains=args.chains, iter=args.iter,
+    #     #                      verbose=args.verbose, seed=args.seed)
+    #     # print(fit)
     #
+    # # cv_results = validation.sliding_window_cv(model, data, args)
+    # n_splits = 34
+    # cv_results = validation.time_series_cv(model, data, args, n_splits=n_splits)
+    # kernel = RBF()
+    # model = GaussianProcessRegressor(kernel=kernel, normalize_y=True, random_state=42)
+    cv_results = validation.leave_p_out_cv(model, data, args, p=1, batched=False)
+    # print(np.mean(cv_results['rmse']))
+    # print(np.mean(cv_results['r2']))
+    # #
     mean_rmse = np.mean(cv_results['test']['rmse'])
     mean_rrmse = np.mean(cv_results['test']['rrmse'])
     mean_ns = np.mean(cv_results['test']['ns_eff'])
@@ -46,16 +60,18 @@ if __name__ == '__main__':
     print('Mean NS:', mean_ns)
     print('Mean Explained Var: ', mean_explained_var)
     print('Mean R2: ', mean_r2)
-
-    print(cv_results['test']['predicted_yields'])
-    print(cv_results['test']['actual_yields'])
-    plt.plot(np.arange(1980, 2015), cv_results['test']['predicted_yields'],
-             marker='s', color='b', label='Predicted Yield')
-    plt.plot(np.arange(1980, 2015), cv_results['test']['actual_yields'],
-             marker='s', color='k', label='Observed Yield')
-    plt.xlabel('Year')
-    plt.ylabel('Yield (tonnes ha$^{-1}$)')
-    plt.legend()
+    #
+    # print(cv_results['test']['predicted_yields'])
+    # print(cv_results['test']['actual_yields'])
+    plt.scatter(cv_results['test']['actual_yields'], cv_results['test']['predicted_yields'],
+                color='k', label='Predicted Yield')
+    plt.plot(cv_results['test']['actual_yields'], cv_results['test']['actual_yields'],
+             color='k', label='Predicted Yield', alpha=0.5)
+    # plt.plot(np.arange(1980, 2015), cv_results['test']['actual_yields'],
+    #          marker='s', color='k', label='Observed Yield')
+    plt.xlabel('Actual yield (tonnes ha$^{-1}$)')
+    plt.ylabel('Predicted yield (tonnes ha$^{-1}$)')
+    # plt.legend()
     plt.savefig('./figures/sliding_window_us_maize.pdf')
     plt.savefig('./figures/sliding_window_us_maize.png')
     plt.show()

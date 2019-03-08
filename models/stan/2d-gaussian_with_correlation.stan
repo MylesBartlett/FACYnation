@@ -14,10 +14,10 @@ functions {
             reci = i;
             //dy[reci]=norm*exp(-0.5*( square( (precip[reci]-mu_p)/sigma_p)  ) );
             //dy[reci]=norm*exp(-0.5*( square( (temp[reci]-mu_t)/sigma_t)  ) );
-            dy[reci]=norm*exp(-(1/(2 - 2*square(rho)))*(   square( (temp[reci]-mu_t)/sigma_t) 
+            dy[reci]=norm*exp(-(1/(2 - 2*square(rho)))*(   square( (temp[reci]-mu_t)/sigma_t)
                                                         +  square( (precip[reci]- mu_p)/sigma_p)
                                                         -  2*rho*(temp[reci]-mu_t)*(precip[reci]- mu_p)/(sigma_t*sigma_p)
-                                                        ) 
+                                                        )
                               );
         }
         return sum(dy);
