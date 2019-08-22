@@ -10,10 +10,7 @@ import random
 
 def _cross_validate_batched(model, data, cross_validator):
 
-    cv_results = {
-        'rmse': [],
-        'r2': []
-    }
+    cv_results = {'test': {'rmse': [], 'r2': []}}
 
     for i, (train_index, test_index) in enumerate(cross_validator.split(data['d_yields'][0])):
         train_data = extract_data_by_year_index(data, train_index)
@@ -22,8 +19,8 @@ def _cross_validate_batched(model, data, cross_validator):
         X_test, y_test = batch_data(test_data).values()
 
         model.fit(X_train, y_train)
-        cv_results['rmse'].append(mean_squared_error(model.predict(X_test), y_test)**0.5)
-        cv_results['r2'].append(model.score(X_test, y_test))
+        cv_results['test']['rmse'].append(mean_squared_error(model.predict(X_test), y_test)**0.5)
+        cv_results['test']['r2'].append(model.score(X_test, y_test))
 
     return cv_results
 
