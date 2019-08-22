@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions, range(3, 9))
 
-    save_path = f'models/saved_models/{args.saved_model}_save'
+    save_path = f'models/saved_models/{args.model}_save'
 
     # # Load model to circumvent compile time
     load_path = f'{save_path}.pkl'
