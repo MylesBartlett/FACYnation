@@ -1,3 +1,4 @@
+import argparse
 from sys import argv
 
 from utils import model_utils, config, data_loading, validation
@@ -16,9 +17,19 @@ from sklearn.gaussian_process.kernels \
 _DEFAULT_CONFIG = 'run_configs/corr_bvg.ini'
 
 
+def run():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mode', type=str, choices=['BVG', 'GP', 'LR'],
+                        default='BVG')
+
+
 if __name__ == '__main__':
+
     args = config.parse_arguments(argv[1] if len(argv) >= 2 else _DEFAULT_CONFIG)
     # model = models.models.fetch_model(args.model)
+
+    # 
+    # Load the data
     us_maize_regions = ['Indiana', 'Illinois', 'Ohio', 'Nebraska', 'Iowa', 'Minnesota']  # Growing season: April through to September
     china_spring_maize_regions = ['Heilongjiang', 'Jilin', 'Liaoning']  # need to address nans
     brazil_soybean = ['MatoGrosso']
@@ -29,8 +40,7 @@ if __name__ == '__main__':
 
     data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions, range(3, 9))
 
-
-    save_path = f'models/saved_models/{args.model}_save'
+    save_path = f'models/saved_models/{args.saved_model}_save'
 
     # # Load model to circumvent compile time
     load_path = f'{save_path}.pkl'
@@ -54,16 +64,17 @@ if __name__ == '__main__':
     mean_ns = np.mean(cv_results['test']['ns_eff'])
     mean_explained_var = np.mean(cv_results['test']['explained_var'])
     mean_r2 = np.mean(cv_results['test']['r2'])
-
+    #
     print('Mean RMSE: ', mean_rmse)
     print('Mean RRMSE: ', mean_rrmse)
     print('Mean NS:', mean_ns)
     print('Mean Explained Var: ', mean_explained_var)
     print('Mean R2: ', mean_r2)
     #
-    # print(cv_results['test']['predicted_yields'])
-    # print(cv_results['test']['actual_yields'])
-    plt.scatter(cv_results['test']['actual_yields'], cv_results['test']['predicted_yields'],
+    print(cv_results['test']['predicted_yields'])
+    print(cv_results['test']['actual_yields'])
+
+    plt.scatter(np.reshape(cv_results['test']['actual_yields'], -1), np.reshape(cv_results['test']['predicted_yields'], -1),
                 color='k', label='Predicted Yield')
     plt.plot(cv_results['test']['actual_yields'], cv_results['test']['actual_yields'],
              color='k', label='Predicted Yield', alpha=0.5)
@@ -72,8 +83,8 @@ if __name__ == '__main__':
     plt.xlabel('Actual yield (tonnes ha$^{-1}$)')
     plt.ylabel('Predicted yield (tonnes ha$^{-1}$)')
     # plt.legend()
-    plt.savefig('./figures/sliding_window_us_maize.pdf')
-    plt.savefig('./figures/sliding_window_us_maize.png')
+    # plt.savefig('./figures/loo_all_states_us_maize.pdf')
+    # plt.savefig('./figures/loo_all_states_us_maize.png')
     plt.show()
 
     # fit = model.sampling(data, chains=args.chains, iter=args.iter,
@@ -101,3 +112,7 @@ if __name__ == '__main__':
     #                                pm['sigma_p'], [pm['norm']], pm['rho'])
     # ax.plot()
     # plt.show()
+
+
+if __name__ == '__main__':
+    run()

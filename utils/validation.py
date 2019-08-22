@@ -50,7 +50,7 @@ def _cross_validate(model, data, cross_validator, args):
                                                                                        cv_results['test'])
 
         print(f'====> Fold {i+1} validation\nRMSE: {rmse_test}\nRRMSE: {rrmse_test:.4f}\nNS: {ns_eff_test:.4f}\n'
-              f'Explained var: {explained_var_test:.4f}\n{rrmse_test:.4f}')
+              f'Explained var: {explained_var_test:.4f}\n{r2_test:.4f}')
 
     return cv_results
 
@@ -68,8 +68,8 @@ def _cv_evaluate(param_means, data, cv_dict):
     explained_var = explained_variance_score(y_pred, y_true)
     r2 = r2_score(y_pred, y_true)
 
-    cv_dict['predicted_yields'].extend(np.nanmean(y_pred, axis=0).flatten())
-    cv_dict['actual_yields'].extend(np.nanmean(y_true, axis=0).flatten())
+    cv_dict['predicted_yields'].extend(y_pred.flatten())
+    cv_dict['actual_yields'].extend(y_true.flatten())
 
     cv_dict['rmse'].append(rmse)
     cv_dict['rrmse'].append(rrmse)
