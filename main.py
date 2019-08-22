@@ -1,20 +1,17 @@
-import argparse
 import os
 from sys import argv
 import _pickle
+import os
+from sys import argv
 
-from utils import model_utils, config, data_loading, validation
-import pylab as plt
-import utils.plotting
 import numpy as np
-import models.models
-from sklearn.linear_model import LinearRegression, RidgeCV
-from sklearn.model_selection import train_test_split, LeavePOut, TimeSeriesSplit
-from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import StandardScaler
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels \
-    import RBF, WhiteKernel, RationalQuadratic, ExpSineSquared
+    import RBF
+from sklearn.linear_model import LinearRegression
+
+import models.models
+from utils import model_utils, config, data_loading, validation
 
 _DEFAULT_CONFIG = 'run_configs/corr_bvg.ini'
 
