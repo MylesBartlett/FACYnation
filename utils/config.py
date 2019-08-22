@@ -56,7 +56,7 @@ def parse_arguments(config_file):
     parser.read(config_file)
 
     general_config = get_section(parser, 'general')
-    args.set_str(general_config, 'saved_model')
+    args.set_str(general_config, 'model')
 
     # MCMC settings
     mcmc_config = get_section(parser, 'mcmc')
