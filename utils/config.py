@@ -65,6 +65,10 @@ def parse_arguments(config_file):
     args.set_bool(mcmc_config, 'verbose')
     args.set_int(mcmc_config, 'seed')
 
+    # GP settings
+    gp_params = get_section(parser, 'params')
+    args.set_str(gp_params, 'kernel'
+                 )
     return args
 
 
