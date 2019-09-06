@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 
 
-def load_temp_precip_data(crop: str, season: str, country, regions: list, month_indexes):
+def load_temp_precip_data(crop: str, season: str, country, regions: list, month_indexes, mean_anom=True):
+    anom_type = 'mean' if mean_anom else 'median'
+
     crop_season_country = [crop, season, country] if season != ''\
         else [crop, country]
     crop_season_country = '_'.join(crop_season_country)
@@ -14,7 +16,7 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     clim_precip_crop = pd.read_table(f'./Crop_data_files/clim_file/precip_climatology_{crop}.csv')
     clim_precip_crop.rename(columns={'Unnamed: 0': 'Crop_season_location'}, inplace=True)
     # Read in Yields
-    yields = pd.read_table(f'./Crop_data_files/{crop}_median_yield_anoms.csv')
+    yields = pd.read_table(f'./Crop_data_files/{crop}_{anom_type}_yield_anoms.csv')
     years = None
     # Read in and add back mean temperature to get real temperature values
     temp_regions = []

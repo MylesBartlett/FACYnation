@@ -10,7 +10,13 @@ import random
 
 def _cross_validate_batched(model, data, cross_validator):
 
-    cv_results = {'test': {'rmse': [], 'r2': []}}
+    cv_results = {'test':
+        {
+            'rmse': [],
+            'r2': [],
+            'predicted_yields': [],
+            'actual_yields': []}
+    }
 
     for i, (train_index, test_index) in enumerate(cross_validator.split(data['d_yields'][0])):
         train_data = extract_data_by_year_index(data, train_index)
@@ -19,8 +25,13 @@ def _cross_validate_batched(model, data, cross_validator):
         X_test, y_test = batch_data(test_data).values()
 
         model.fit(X_train, y_train)
-        cv_results['test']['rmse'].append(mean_squared_error(model.predict(X_test), y_test)**0.5)
-        cv_results['test']['r2'].append(model.score(X_test, y_test))
+        y_pred = model.predict(X_test)
+
+        cv_results['test']['rmse'].append(mean_squared_error(y_pred, y_test)**0.5)
+        print(r2_score(y_test, y_pred))
+        cv_results['test']['r2'].append(r2_score(y_true=y_test, y_pred=y_pred))
+        cv_results['test']['predicted_yields'].append(y_pred)
+        cv_results['test']['actual_yields'].append(y_test)
 
     return cv_results
 
@@ -63,7 +74,7 @@ def _cv_evaluate(param_means, data, cv_dict):
     rrmse = utils.metrics.rrmse(y_pred, y_true)
     ns_eff = utils.metrics.nash_sutcliffe_eff(y_pred, y_true)
     explained_var = explained_variance_score(y_pred, y_true)
-    r2 = r2_score(y_pred, y_true)
+    r2 = r2_score(y_true=y_true, y_pred=y_pred)
 
     cv_dict['predicted_yields'].extend(y_pred.flatten())
     cv_dict['actual_yields'].extend(y_true.flatten())
