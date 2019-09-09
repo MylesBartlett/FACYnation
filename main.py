@@ -12,7 +12,7 @@ import models.models
 from utils import config, data_loading, validation
 from utils.model_utils import save_model, load_model
 
-_DEFAULT_CONFIG = 'run_configs/corr_bvg.ini'
+_DEFAULT_CONFIG = 'run_configs/gp.ini'
 logging.getLogger("pystan").propagate = False
 
 
@@ -30,7 +30,7 @@ def run(cv_method='loo'):
     us_maize_regions = ['Indiana', 'Illinois', 'Ohio', 'Nebraska', 'Iowa',
                         'Minnesota']  # Growing season: April through to September
 
-    data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions, range(3, 9), mean_anom=False)
+    data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions, range(3, 9), anom_type='frac')
 
     if args.model.lower() == 'corr_bvg' or args.model == 'uncorr_bvg':
         save_path = f'models/saved_models/{args.model}_save'
@@ -76,19 +76,19 @@ def run(cv_method='loo'):
 
     print_metrics(cv_results)
 
-    plt.scatter(np.reshape(cv_results['test']['actual_yields'], -1),
-                np.reshape(cv_results['test']['predicted_yields'], -1),
-                color='k', label='Predicted', s=20)
-    plt.plot(cv_results['test']['actual_yields'], cv_results['test']['actual_yields'],
-             color='k', label='Actual', alpha=0.3)
-    # plt.plot(np.arange(1980, 2015), cv_results['test']['actual_yields'],
-    #          marker='s', color='k', label='Observed Yield')
-    plt.xlabel('Actual yield (tonnes ha$^{-1}$)')
-    plt.ylabel('Predicted yield (tonnes ha$^{-1}$)')
-    # plt.legend()
-    plt.savefig('./figures/loo_all_states_us_maize.pdf')
-    plt.savefig('./figures/loo_all_states_us_maize.png')
-    plt.show()
+    # plt.scatter(np.reshape(cv_results['test']['actual_yields'], -1),
+    #             np.reshape(cv_results['test']['predicted_yields'], -1),
+    #             color='k', label='Predicted', s=20)
+    # plt.plot(cv_results['test']['actual_yields'], cv_results['test']['actual_yields'],
+    #          color='k', label='Actual', alpha=0.3)
+    # # plt.plot(np.arange(1980, 2015), cv_results['test']['actual_yields'],
+    # #          marker='s', color='k', label='Observed Yield')
+    # plt.xlabel('Actual yield (tonnes ha$^{-1}$)')
+    # plt.ylabel('Predicted yield (tonnes ha$^{-1}$)')
+    # # plt.legend()
+    # plt.savefig('loo_all_states_us_maize_frac_anom.pdf')
+    # plt.savefig('loo_all_states_us_maize_frac_anom.png')
+    # plt.show()
 
 
 if __name__ == '__main__':

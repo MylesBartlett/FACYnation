@@ -28,7 +28,6 @@ def _cross_validate_batched(model, data, cross_validator):
         y_pred = model.predict(X_test)
 
         cv_results['test']['rmse'].append(mean_squared_error(y_pred, y_test)**0.5)
-        print(r2_score(y_test, y_pred))
         cv_results['test']['r2'].append(r2_score(y_true=y_test, y_pred=y_pred))
         cv_results['test']['predicted_yields'].append(y_pred)
         cv_results['test']['actual_yields'].append(y_test)

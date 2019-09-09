@@ -12,10 +12,8 @@ def yield_anomaly_tp(temp, precip, mu_t, mu_p, sigma_t, sigma_p, norm, rho=None)
         norm = norm * np.ones(n_months)
     dy = np.zeros(n_months)
     for month in range(n_months):
-        dy[month] = norm[month]*np.exp(-0.5 *( np.square((temp[month] - mu_t)/sigma_t)
-                                             + np.square((precip[month] - mu_p)/sigma_p)))
-        # dy[month] = norm[month] * dist.bivariate_normal(temp[month], precip[month],
-        #                                                 mu_t, mu_p, sigma_t, sigma_p, rho)
+        dy[month] = norm[month] * np.exp(-0.5 * (np.square((temp[month] - mu_t) / sigma_t)
+                                                 + np.square((precip[month] - mu_p) / sigma_p)))
 
     return np.sum(dy)
 

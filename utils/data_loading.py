@@ -2,8 +2,14 @@ import pandas as pd
 import numpy as np
 
 
-def load_temp_precip_data(crop: str, season: str, country, regions: list, month_indexes, mean_anom=True):
-    anom_type = 'mean' if mean_anom else 'median'
+_VALID_ANOM_TYPES = ['median', 'mean', 'frac']
+
+
+def load_temp_precip_data(crop: str, season: str, country, regions: list, month_indexes, anom_type='mean'):
+    anom_type = anom_type.lower()
+    if anom_type not in _VALID_ANOM_TYPES:
+        raise ValueError(f"{anom_type} is not a valid anomaly type."
+                         f"Must be one of {anom_type}")
 
     crop_season_country = [crop, season, country] if season != ''\
         else [crop, country]
@@ -62,13 +68,14 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     d_temp = np.delete(d_temp, missing_year_inds, axis=1)
     d_precip = np.delete(d_precip, missing_year_inds, axis=1)
 
+    offset = 1 if anom_type == 'frac' else 9.75
     data = {
         'n_regions': n_regions,
         'n_years': n_years,
         'n_months': n_months,
         'd_temp': d_temp,
         'd_precip': d_precip,
-        'd_yields': np.array(d_yields).astype(float) + 9.75,   # adjust for current values (this adjustment factor only applies to USA Maize)
+        'd_yields': np.array(d_yields).astype(float) + offset,  # adjust for current values (this adjustment factor only applies to USA Maize)
         'n_gf': 40,
         'temp': np.arange(0, 40, 1),
         'precip': np.arange(0, 200, 5),
