@@ -12,7 +12,7 @@ import models.models
 from utils import config, data_loading, validation
 from utils.model_utils import save_model, load_model
 
-_DEFAULT_CONFIG = 'run_configs/gp.ini'
+_DEFAULT_CONFIG = 'run_configs/corr_bvg.ini'
 logging.getLogger("pystan").propagate = False
 
 
@@ -24,13 +24,14 @@ def print_metrics(cv_results):
     print('Mean R2: ', mean_r2)
 
 
-def run(cv_method='loo'):
+def run(cv_method='loo', anom_type='mean'):
     args = config.parse_arguments(argv[1] if len(argv) >= 2 else _DEFAULT_CONFIG)
     # Load the data
     us_maize_regions = ['Indiana', 'Illinois', 'Ohio', 'Nebraska', 'Iowa',
                         'Minnesota']  # Growing season: April through to September
 
-    data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions, range(3, 9), anom_type='frac')
+    data = data_loading.load_temp_precip_data('Maize', 'Spring', 'USA', us_maize_regions,
+                                              range(3, 9), anom_type=anom_type)
 
     if args.model.lower() == 'corr_bvg' or args.model == 'uncorr_bvg':
         save_path = f'models/saved_models/{args.model}_save'
@@ -45,7 +46,6 @@ def run(cv_method='loo'):
         # Fit the model
         fit = model.sampling(data, chains=args.chains, iter=args.iter,
                              verbose=args.verbose, seed=args.seed)
-        print(fit)
     elif args.model.lower() == 'gp':
         kernel = RBF()
         model = GaussianProcessRegressor(kernel=kernel, normalize_y=True, random_state=42)
@@ -76,6 +76,17 @@ def run(cv_method='loo'):
 
     print_metrics(cv_results)
 
+    import pandas as pd
+
+    test_preds = cv_results['test']['predicted_yields']
+    test_preds_df = pd.DataFrame(test_preds)
+    test_preds_df.to_csv(f"{args.model}_{cv_method}_{anom_type}_preds")
+
+    test_observed = cv_results['test']['actual_yields']
+    test_observed_df = pd.DataFrame(test_observed)
+    test_observed_df.to_csv(f"{args.model}_{cv_method}_{anom_type}_observed")
+
+
     # plt.scatter(np.reshape(cv_results['test']['actual_yields'], -1),
     #             np.reshape(cv_results['test']['predicted_yields'], -1),
     #             color='k', label='Predicted', s=20)
@@ -92,4 +103,4 @@ def run(cv_method='loo'):
 
 
 if __name__ == '__main__':
-    run(cv_method='loo')
+    run(cv_method='loo', anom_type='frac')

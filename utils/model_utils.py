@@ -1,5 +1,6 @@
 import pickle
 import numpy as np
+import random
 
 # from xidplus.stan_fit import stan_utility
 
@@ -21,8 +22,11 @@ def extract_parameter_means(samples) -> dict:
     return mean_parameters
 
 
-# This function should probably go somewhere else
-def diagnose_fit(fit):
-    stan_utility.check_div(fit)
-    stan_utility.check_energy(fit)
-    stan_utility.check_treedepth(fit)
+def sample_parameters(samples, num_samples_to_draw=20) -> dict:
+    parameters = {}
+    for key, val in samples.items():
+        if key not in _VALID_PARAMS:
+            continue
+        parameters[key] = random.sample(list(val), num_samples_to_draw)
+
+    return parameters

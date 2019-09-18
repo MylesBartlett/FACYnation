@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 
-
 _VALID_ANOM_TYPES = ['median', 'mean', 'frac']
 
 
@@ -11,26 +10,26 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
         raise ValueError(f"{anom_type} is not a valid anomaly type."
                          f"Must be one of {anom_type}")
 
-    crop_season_country = [crop, season, country] if season != ''\
+    crop_season_country = [crop, season, country] if season != '' \
         else [crop, country]
     crop_season_country = '_'.join(crop_season_country)
 
     # Read in climate temperatures
-    clim_temp_crop = pd.read_table(f'./Crop_data_files/clim_file/temp_climatology_{crop}.csv')
+    clim_temp_crop = pd.read_csv(f'./Crop_data_files/clim_file/temp_climatology_{crop}.csv', sep='\t')
     clim_temp_crop.rename(columns={'Unnamed: 0': 'Crop_season_location'}, inplace=True)
     # Read in climate precipitation
-    clim_precip_crop = pd.read_table(f'./Crop_data_files/clim_file/precip_climatology_{crop}.csv')
+    clim_precip_crop = pd.read_csv(f'./Crop_data_files/clim_file/precip_climatology_{crop}.csv', sep='\t')
     clim_precip_crop.rename(columns={'Unnamed: 0': 'Crop_season_location'}, inplace=True)
     # Read in Yields
-    yields = pd.read_table(f'./Crop_data_files/{crop}_{anom_type}_yield_anoms.csv')
+    yields = pd.read_csv(f'./Crop_data_files/{crop}_{anom_type}_yield_anoms.csv', sep='\t')
     years = None
     # Read in and add back mean temperature to get real temperature values
     temp_regions = []
     for i, region in enumerate(regions):
-        maize_temp = pd.read_table(f'./Crop_data_files/{crop}_met_anoms/{crop_season_country}'
-                                   f'_{region}_temp_anom_real.csv')
+        maize_temp = pd.read_csv(f'./Crop_data_files/{crop}_met_anoms/{crop_season_country}'
+                                 f'_{region}_temp_anom_real.csv', sep='\t')
         maize_temp.rename(columns={'Unnamed: 0': 'Year'}, inplace=True)
-        if years is None:   # we need to know which yield years we have climatology data for
+        if years is None:  # we need to know which yield years we have climatology data for
             years = maize_temp['Year'].apply(str).values
         means = clim_temp_crop[clim_temp_crop['Crop_season_location']
                                == f'{crop_season_country}_{regions[i]}'].iloc[0, 1:, ]
@@ -41,8 +40,8 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     # Read in and add back mean precipitation to get real precipitation values
     pecip_regions = []
     for i, region in enumerate(regions):
-        maize_precip = pd.read_table(
-            f'./Crop_data_files/{crop}_met_anoms/{crop_season_country}_{region}_precip_anom_real.csv')
+        maize_precip = pd.read_csv(
+            f'./Crop_data_files/{crop}_met_anoms/{crop_season_country}_{region}_precip_anom_real.csv', sep='\t')
         maize_precip.rename(columns={'Unnamed: 0': 'Year'}, inplace=True)
         means = clim_precip_crop[clim_precip_crop['Crop_season_location']
                                  == f'{crop_season_country}_{regions[i]}'].iloc[0, 1:, ]
@@ -55,14 +54,14 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     n_regions = len(regions)
 
     d_yields = yields[yields["Region"].isin(
-            [f'{crop_season_country}_{region}' for region in regions])][years]
-    missing_year_inds = d_yields.isna().any().nonzero()[0]
+        [f'{crop_season_country}_{region}' for region in regions])][years]
+    missing_year_inds = d_yields.isna().any().to_numpy().nonzero()[0]
     n_years -= len(missing_year_inds)
     d_yields.dropna(axis=1, inplace=True)
 
     # Drop years with missing yield values
     d_temp = np.array(temp_regions.iloc[:, month_indexes]).reshape(
-            n_regions, -1, n_months).astype(float)
+        n_regions, -1, n_months).astype(float)
     d_precip = np.array(pecip_regions.iloc[:, month_indexes]).reshape(
         n_regions, -1, n_months).astype(float)
     d_temp = np.delete(d_temp, missing_year_inds, axis=1)
@@ -75,7 +74,8 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
         'n_months': n_months,
         'd_temp': d_temp,
         'd_precip': d_precip,
-        'd_yields': np.array(d_yields).astype(float) + offset,  # adjust for current values (this adjustment factor only applies to USA Maize)
+        'd_yields': np.array(d_yields).astype(float) + offset,
+        # adjust for current values (this adjustment factor only applies to USA Maize)
         'n_gf': 40,
         'temp': np.arange(0, 40, 1),
         'precip': np.arange(0, 200, 5),
