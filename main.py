@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, Ridge, RidgeCV
 
 import models.models
 from utils import config, data_loading, validation
@@ -47,11 +47,12 @@ def run(cv_method='loo', anom_type='mean'):
         fit = model.sampling(data, chains=args.chains, iter=args.iter,
                              verbose=args.verbose, seed=args.seed)
     elif args.model.lower() == 'gp':
-        kernel = RBF()
+        kernel = RBF(length_scale=0.5)
         model = GaussianProcessRegressor(kernel=kernel, normalize_y=True, random_state=42)
         batched = True
     elif args.model.lower() == 'lr':
-        model = LinearRegression()
+        # model = LinearRegression(fit_intercept=True, normalize=True)
+        model = RidgeCV()
         batched = True
     else:
         raise ValueError('Invalid model type.')
@@ -76,20 +77,20 @@ def run(cv_method='loo', anom_type='mean'):
 
     print_metrics(cv_results)
 
-    import pandas as pd
-
-    test_preds = cv_results['test']['predicted_yields']
-    test_preds_df = pd.DataFrame(test_preds)
-    test_preds_df.to_csv(f"{args.model}_{cv_method}_{anom_type}_preds")
-
-    test_observed = cv_results['test']['actual_yields']
-    test_observed_df = pd.DataFrame(test_observed)
-    test_observed_df.to_csv(f"{args.model}_{cv_method}_{anom_type}_observed")
-
-
+    # import pandas as pd
+    #
+    # test_preds = cv_results['test']['predicted_yields']
+    # test_preds_df = pd.DataFrame(test_preds)
+    # test_preds_df.to_csv(f"{args.model}_{cv_method}_{anom_type}_preds")
+    #
+    # test_observed = cv_results['test']['actual_yields']
+    # test_observed_df = pd.DataFrame(test_observed)
+    # test_observed_df.to_csv(f"{args.model}_{cv_method}_{anom_type}_observed")
+    #
     # plt.scatter(np.reshape(cv_results['test']['actual_yields'], -1),
     #             np.reshape(cv_results['test']['predicted_yields'], -1),
-    #             color='k', label='Predicted', s=20)
+    #             label='Predicted', s=20,
+    #             edgecolors=(0, 0, 0))
     # plt.plot(cv_results['test']['actual_yields'], cv_results['test']['actual_yields'],
     #          color='k', label='Actual', alpha=0.3)
     # # plt.plot(np.arange(1980, 2015), cv_results['test']['actual_yields'],
@@ -97,10 +98,10 @@ def run(cv_method='loo', anom_type='mean'):
     # plt.xlabel('Actual yield (tonnes ha$^{-1}$)')
     # plt.ylabel('Predicted yield (tonnes ha$^{-1}$)')
     # # plt.legend()
-    # plt.savefig('loo_all_states_us_maize_frac_anom.pdf')
-    # plt.savefig('loo_all_states_us_maize_frac_anom.png')
+    # plt.savefig(f'loo_{args.model}_{cv_method}_{anom_type}.pdf')
+    # plt.savefig(f'{args.model}_{cv_method}_{anom_type}.png')
     # plt.show()
 
 
 if __name__ == '__main__':
-    run(cv_method='loo', anom_type='frac')
+    run(cv_method='lto', anom_type='mean')

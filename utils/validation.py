@@ -1,5 +1,6 @@
 from sklearn import model_selection as ms
 from sklearn.metrics import mean_squared_error, explained_variance_score, r2_score
+from sklearn.preprocessing import StandardScaler
 
 from utils import model_utils, evaluate, metrics
 from utils.data_loading import extract_data_by_year_index, batch_data
@@ -20,10 +21,21 @@ def _cross_validate_batched(model, data, cross_validator):
     for i, (train_index, test_index) in enumerate(cross_validator.split(data['d_yields'][0])):
         train_data = extract_data_by_year_index(data, train_index)
         test_data = extract_data_by_year_index(data, test_index)
+
         X_train, y_train = batch_data(train_data).values()
         X_test, y_test = batch_data(test_data).values()
 
-        model.fit(X_train, y_train)
+        scaler = StandardScaler()
+
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+
+        y_train = scaler.fit_transform(np.reshape(y_train, (-1, 1)))
+        y_test = scaler.fit_transform(np.reshape(y_test, (-1, 1)))
+        y_train = np.reshape(y_train, (-1,))
+        y_test = np.reshape(y_test, (-1,))
+
+        model = model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
 
         r2 = metrics.gelman_r2(y_true=y_test, y_pred=y_pred)
