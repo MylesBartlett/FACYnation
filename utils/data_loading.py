@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-_VALID_ANOM_TYPES = ['median', 'mean', 'frac']
+_VALID_ANOM_TYPES = ['median', 'mean', 'frac', 'linear_detrended']
 
 
 def load_temp_precip_data(crop: str, season: str, country, regions: list, month_indexes, anom_type='mean'):

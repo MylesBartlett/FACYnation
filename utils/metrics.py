@@ -1,4 +1,5 @@
 from sklearn import metrics
+from sklearn.metrics import r2_score
 import numpy as np
 
 

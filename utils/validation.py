@@ -1,8 +1,7 @@
 from sklearn import model_selection as ms
 from sklearn.metrics import mean_squared_error, explained_variance_score, r2_score
 from sklearn.preprocessing import StandardScaler
-
-from utils import model_utils, evaluate, metrics
+from utils import evaluate, metrics, model_utils
 from utils.data_loading import extract_data_by_year_index, batch_data
 import numpy as np
 import random
@@ -38,7 +37,8 @@ def _cross_validate_batched(model, data, cross_validator):
         model = model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
 
-        r2 = metrics.gelman_r2(y_true=y_test, y_pred=y_pred)
+        # r2 = metrics.gelman_r2(y_true=y_test, y_pred=y_pred)
+        r2 = metrics.r2_score(y_true=y_test, y_pred=y_pred)
 
         cv_results['test']['rmse'].append(mean_squared_error(y_pred, y_test)**0.5)
         cv_results['test']['r2'].append(r2)
@@ -48,7 +48,7 @@ def _cross_validate_batched(model, data, cross_validator):
     return cv_results
 
 
-def _cross_validate(model, data, cross_validator, args, use_mean_params=False):
+def _cross_validate(model, data, cross_validator, args, use_mean_params=True):
 
     cv_values = ['predicted_yields', 'actual_yields', 'rmse', 'rrmse', 'ns_eff', 'explained_var', 'r2']
     cv_results = {'train': {key: [] for key in cv_values},
@@ -89,8 +89,8 @@ def _cv_evaluate(param_means, data, cv_dict, use_mean_params=True):
         y_true = data['d_yields']
         rmse = metrics.rmse(y_true=y_true, y_pred=y_pred)
 
-        r2 = metrics.gelman_r2(y_true=y_true, y_pred=y_pred)
-
+        # r2 = metrics.gelman_r2(y_true=y_true, y_pred=y_pred)
+        r2 = metrics.r2_score(y_true=y_test, y_pred=y_pred)
         cv_dict['predicted_yields'].extend(y_pred)
         cv_dict['actual_yields'].extend(y_true)
 

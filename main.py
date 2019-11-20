@@ -1,5 +1,6 @@
 import logging
 import os
+import argparse
 from sys import argv
 
 import matplotlib.pyplot as plt
@@ -12,9 +13,21 @@ import models.models
 from utils import config, data_loading, validation
 from utils.model_utils import save_model, load_model
 
-_DEFAULT_CONFIG = 'run_configs/corr_bvg.ini'
 logging.getLogger("pystan").propagate = False
 
+
+def arguments():
+    parser = argparse.ArgumentParser()
+    # General data set settings
+    parser.add_argument("--anom-type", type=str,
+                         choices=["mean", "cmnist", "celeba"], default="mean")
+    parser.add_argument("cv-method", type=str,
+                         choices=["loo", "lto", "rolling", "time-series"], default="loo")
+    parser.add_argument("model", type=str,
+                        choices=["corr_bvg", "lr", "gp"], default="corr_bvg")
+    
+    return parser.parse_args()
+    
 
 def print_metrics(cv_results):
     mean_rmse = np.mean(cv_results['test']['rmse'])
@@ -24,8 +37,8 @@ def print_metrics(cv_results):
     print('Mean R2: ', mean_r2)
 
 
-def run(cv_method='loo', anom_type='mean'):
-    args = config.parse_arguments(argv[1] if len(argv) >= 2 else _DEFAULT_CONFIG)
+def run(cv_method='loo', anom_type='mean', model="corr_bvg"):
+    args = f"run_configs/{model}.ini"
     # Load the data
     us_maize_regions = ['Indiana', 'Illinois', 'Ohio', 'Nebraska', 'Iowa',
                         'Minnesota']  # Growing season: April through to September
@@ -104,4 +117,5 @@ def run(cv_method='loo', anom_type='mean'):
 
 
 if __name__ == '__main__':
-    run(cv_method='lto', anom_type='mean')
+    args = arguments()
+    run(cv_method=args.cv_method, anom_type=args.anom_type, model=args.model)
