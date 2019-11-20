@@ -1,6 +1,7 @@
+import argparse
 import logging
 import os
-import argparse
+from os.path import exists
 from sys import argv
 
 import matplotlib.pyplot as plt
@@ -11,7 +12,7 @@ from sklearn.linear_model import LinearRegression, Ridge, RidgeCV
 
 import models.models
 from utils import config, data_loading, validation
-from utils.model_utils import save_model, load_model
+from utils.model_utils import load_model, save_model
 
 logging.getLogger("pystan").propagate = False
 
@@ -46,7 +47,10 @@ def run(cv_method='loo', anom_type='mean', model="corr_bvg"):
                                               range(3, 9), anom_type=anom_type)
 
     if args.model.lower() == 'corr_bvg' or args.model == 'uncorr_bvg':
-        save_path = f'models/saved_models/{args.model}_save'
+        save_dir = f'models/saved_models'
+        if not os.exists(save_dir):
+            os.mkdir(save_dir)
+        save_path += f'{args.model}_save'
         load_path = f'{save_path}.pkl'
         if not os.path.exists(load_path):
             model = models.models.fetch_model(args.model)
