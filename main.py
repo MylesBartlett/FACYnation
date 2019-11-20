@@ -21,9 +21,9 @@ def arguments():
     # General data set settings
     parser.add_argument("--anom-type", type=str,
                          choices=["mean", "cmnist", "celeba"], default="mean")
-    parser.add_argument("cv-method", type=str,
+    parser.add_argument("--cv-method", type=str,
                          choices=["loo", "lto", "rolling", "time-series"], default="loo")
-    parser.add_argument("model", type=str,
+    parser.add_argument("--model", type=str,
                         choices=["corr_bvg", "lr", "gp"], default="corr_bvg")
     
     return parser.parse_args()
