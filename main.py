@@ -48,9 +48,9 @@ def run(cv_method='loo', anom_type='mean', model="corr_bvg"):
 
     if args.model.lower() == 'corr_bvg' or args.model == 'uncorr_bvg':
         save_dir = f'models/saved_models'
-        if not os.exists(save_dir):
+        if not os.path.exists(save_dir):
             os.mkdir(save_dir)
-        save_path += f'{args.model}_save'
+        save_path = save_dir + f'{args.model}_save'
         load_path = f'{save_path}.pkl'
         if not os.path.exists(load_path):
             model = models.models.fetch_model(args.model)
