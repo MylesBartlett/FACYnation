@@ -20,7 +20,7 @@ def arguments():
     parser = argparse.ArgumentParser()
     # General data set settings
     parser.add_argument("--anom-type", type=str,
-                         choices=["mean", "cmnist", "celeba"], default="mean")
+                         choices=['median', 'mean', 'frac', 'linear_detrended'], default="mean")
     parser.add_argument("--cv-method", type=str,
                          choices=["loo", "lto", "rolling", "time-series"], default="loo")
     parser.add_argument("--model", type=str,
