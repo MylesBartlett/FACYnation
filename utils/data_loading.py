@@ -26,7 +26,7 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     # Read in and add back mean temperature to get real temperature values
     temp_regions = []
     for i, region in enumerate(regions):
-        maize_temp = pd.read_csv(f'./Crop_data_files/{crop.capitalize()}_met_anoms/{crop_season_country}'
+        maize_temp = pd.read_csv(f'./Crop_data_files/{crop.lower()}_met_anoms/{crop_season_country}'
                                  f'_{region}_temp_anom_real.csv', sep='\t')
         maize_temp.rename(columns={'Unnamed: 0': 'Year'}, inplace=True)
         if years is None:  # we need to know which yield years we have climatology data for
@@ -41,7 +41,7 @@ def load_temp_precip_data(crop: str, season: str, country, regions: list, month_
     pecip_regions = []
     for i, region in enumerate(regions):
         maize_precip = pd.read_csv(
-            f'./Crop_data_files/{crop.capitalize()}_met_anoms/{crop_season_country}_{region}_precip_anom_real.csv', sep='\t')
+            f'./Crop_data_files/{crop.lower()}_met_anoms/{crop_season_country}_{region}_precip_anom_real.csv', sep='\t')
         maize_precip.rename(columns={'Unnamed: 0': 'Year'}, inplace=True)
         means = clim_precip_crop[clim_precip_crop['Crop_season_location']
                                  == f'{crop_season_country}_{regions[i]}'].iloc[0, 1:, ]
