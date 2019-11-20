@@ -90,7 +90,7 @@ def _cv_evaluate(param_means, data, cv_dict, use_mean_params=True):
         rmse = metrics.rmse(y_true=y_true, y_pred=y_pred)
 
         # r2 = metrics.gelman_r2(y_true=y_true, y_pred=y_pred)
-        r2 = metrics.r2_score(y_true=y_test, y_pred=y_pred)
+        r2 = metrics.r2_score(y_true=y_true, y_pred=y_pred)
         cv_dict['predicted_yields'].extend(y_pred)
         cv_dict['actual_yields'].extend(y_true)
 
