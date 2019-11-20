@@ -25,7 +25,6 @@ def arguments():
                          choices=["loo", "lto", "rolling", "time-series"], default="loo")
     parser.add_argument("--model", type=str,
                         choices=["corr_bvg", "lr", "gp"], default="corr_bvg")
-    
     return parser.parse_args()
     
 
@@ -38,7 +37,7 @@ def print_metrics(cv_results):
 
 
 def run(cv_method='loo', anom_type='mean', model="corr_bvg"):
-    args = f"run_configs/{model}.ini"
+    args = config.parse_arguments(f"run_configs/{model}.ini")
     # Load the data
     us_maize_regions = ['Indiana', 'Illinois', 'Ohio', 'Nebraska', 'Iowa',
                         'Minnesota']  # Growing season: April through to September
